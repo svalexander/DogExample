@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">DogExample</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="submit">Submit</string>
+    <string name="terrier">Terrier</string>
+    <string name="spaniel">Spaniel</string>
+    <string name="poodle">Poodle</string>
+    <string name="retriever">Retriever</string>
+</resources>
