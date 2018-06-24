@@ -1,6 +1,7 @@
 package nyc.c4q.shannonalexander_navarro.dogexample.network;
 
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 
@@ -10,6 +11,7 @@ public class DogNetwork {
 
     static Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(BASE_URL)
+            .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 

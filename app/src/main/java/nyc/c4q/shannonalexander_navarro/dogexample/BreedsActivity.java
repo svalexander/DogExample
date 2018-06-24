@@ -22,7 +22,6 @@ public class BreedsActivity extends AppCompatActivity {
 
     TextView welcomeTV;
     ImageView terrierIV, retrieverIV, spanielIV, poodleIV;
-    static final String BASE_URL = "https://dog.ceo/";
     CardView spanielCard, terrierCard, retrieverCard, poodleCard;
     DogService dogNetwork = DogNetwork.createService();
 

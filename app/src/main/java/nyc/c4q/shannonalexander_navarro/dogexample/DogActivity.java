@@ -14,9 +14,10 @@ import java.util.List;
 import nyc.c4q.shannonalexander_navarro.dogexample.models.DogByBreed;
 import nyc.c4q.shannonalexander_navarro.dogexample.network.DogNetwork;
 import nyc.c4q.shannonalexander_navarro.dogexample.network.DogService;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import rx.Observable;
+import rx.Observer;
+import rx.Subscriber;
+import rx.schedulers.Schedulers;
 
 public class DogActivity extends AppCompatActivity {
 
@@ -32,15 +33,13 @@ public class DogActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dog);
         initViews();
-
+        initRV();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        getDogsJSON(chosenBreed);
-        initRV();
-
+        getDogBreed(chosenBreed).subscribe(addDogs);
     }
 
     private void initViews(){
@@ -56,42 +55,37 @@ public class DogActivity extends AppCompatActivity {
     }
 
     private void initRV() {
-
         rv = findViewById(R.id.rv);
         rv.setLayoutManager(new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false));
         dogAdapter = new DogAdapter(list);
         rv.setAdapter(dogAdapter);
     }
 
-    private void getDogsJSON(String breed){
-
-      //  DogNetwork dogNetwork = new DogNetwork();
-
-        Call<DogByBreed> breedCall = dogNetwork.getDogsByBreed(breed);
-        breedCall.enqueue(new Callback<DogByBreed>() {
-            @Override
-            public void onResponse(Call<DogByBreed> call, Response<DogByBreed> response) {
-                DogByBreed dogByBreed = response.body();
-
-                List<String> responseDogs = dogByBreed.getMessage();
-                list.clear();
-                list.addAll(responseDogs);
-                dogAdapter.notifyDataSetChanged();
-                if (response.isSuccessful()){
-
-                    Log.d("item?", list.get(0)+"");
-                } else {
-                    Log.d("failure", response.errorBody().toString()+"");
-
-                }
-
-            }
-
-
-            @Override
-            public void onFailure(Call<DogByBreed> call, Throwable t) {
-
-            }
-        });
+    Observable<DogByBreed> getDogBreed(String chosenBreed){
+        return dogNetwork.getDogsByBreed(chosenBreed).subscribeOn(Schedulers.newThread()).
+                doOnNext(s-> Log.d("list?", "a list from observable"));
+        //is now firing, but i still get an error later
     }
+
+    Observer<DogByBreed> addDogs = new Subscriber<DogByBreed>() {
+        @Override
+        public void onCompleted() {
+
+            Log.d("complete?", "completed");
+        }
+
+        @Override
+        public void onError(Throwable e) {
+
+            //i'm erroring
+            Log.d("error?", "rxerror");
+        }
+
+        @Override
+        public void onNext(DogByBreed dogByBreed) {
+            List<String> responseDogs = dogByBreed.getMessage();
+            list.addAll(responseDogs);
+            dogAdapter.notifyDataSetChanged();
+        }
+    };
 }

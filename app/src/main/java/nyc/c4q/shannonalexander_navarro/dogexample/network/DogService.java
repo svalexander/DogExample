@@ -5,6 +5,7 @@ import nyc.c4q.shannonalexander_navarro.dogexample.models.RandomDog;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
+import rx.Observable;
 
 
 public interface DogService {
@@ -14,5 +15,5 @@ public interface DogService {
     Call<RandomDog> getARandomDog(@Path("breed") String breed);
 
     @GET("api/breed/{breed}/images")
-    Call<DogByBreed> getDogsByBreed(@Path("breed") String breed);
+    Observable<DogByBreed> getDogsByBreed(@Path("breed") String breed);
 }
