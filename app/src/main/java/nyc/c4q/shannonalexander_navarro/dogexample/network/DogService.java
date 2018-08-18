@@ -10,7 +10,6 @@ import rx.Observable;
 
 public interface DogService {
 
-
     @GET("api/breed/{breed}/images/random")
     Call<RandomDog> getARandomDog(@Path("breed") String breed);
 

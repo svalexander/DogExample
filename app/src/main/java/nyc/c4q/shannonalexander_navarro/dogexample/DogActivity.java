@@ -14,10 +14,8 @@ import java.util.List;
 import nyc.c4q.shannonalexander_navarro.dogexample.models.DogByBreed;
 import nyc.c4q.shannonalexander_navarro.dogexample.network.DogNetwork;
 import nyc.c4q.shannonalexander_navarro.dogexample.network.DogService;
-import rx.Observable;
 import rx.Observer;
-import rx.Subscriber;
-import rx.schedulers.Schedulers;
+import rx.android.schedulers.AndroidSchedulers;
 
 public class DogActivity extends AppCompatActivity {
 
@@ -26,7 +24,7 @@ public class DogActivity extends AppCompatActivity {
     RecyclerView rv;
     DogAdapter dogAdapter;
     List<String> list = new ArrayList<>();
-    DogService dogNetwork = DogNetwork.createService();
+    DogService dogService = DogNetwork.createService();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,17 +37,38 @@ public class DogActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        getDogBreed(chosenBreed).subscribe(addDogs);
+        dogService.getDogsByBreed(chosenBreed)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<DogByBreed>() {
+            @Override
+            public void onCompleted() {
+                Log.d("complete?", "completed");
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Log.d("error?", "rxerror");
+            }
+
+            @Override
+            public void onNext(DogByBreed dogByBreed) {
+                Log.d("next?", "rxnext");
+                List<String> responseDogs = dogByBreed.getMessage();
+                list.addAll(responseDogs);
+                dogAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
-    private void initViews(){
+    private void initViews() {
         chosenBreedTV = findViewById(R.id.breedTV);
         getBreed();
         chosenBreedTV.setText(chosenBreed);
     }
-    private String getBreed(){
+
+    private String getBreed() {
         Intent intent = getIntent();
-         chosenBreed = intent.getStringExtra("BreedKey");
+        chosenBreed = intent.getStringExtra("BreedKey");
 
         return chosenBreed;
     }
@@ -60,32 +79,4 @@ public class DogActivity extends AppCompatActivity {
         dogAdapter = new DogAdapter(list);
         rv.setAdapter(dogAdapter);
     }
-
-    Observable<DogByBreed> getDogBreed(String chosenBreed){
-        return dogNetwork.getDogsByBreed(chosenBreed).subscribeOn(Schedulers.newThread()).
-                doOnNext(s-> Log.d("list?", "a list from observable"));
-        //is now firing, but i still get an error later
-    }
-
-    Observer<DogByBreed> addDogs = new Subscriber<DogByBreed>() {
-        @Override
-        public void onCompleted() {
-
-            Log.d("complete?", "completed");
-        }
-
-        @Override
-        public void onError(Throwable e) {
-
-            //i'm erroring
-            Log.d("error?", "rxerror");
-        }
-
-        @Override
-        public void onNext(DogByBreed dogByBreed) {
-            List<String> responseDogs = dogByBreed.getMessage();
-            list.addAll(responseDogs);
-            dogAdapter.notifyDataSetChanged();
-        }
-    };
 }

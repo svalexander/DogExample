@@ -3,6 +3,7 @@ package nyc.c4q.shannonalexander_navarro.dogexample.network;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import rx.schedulers.Schedulers;
 
 
 public class DogNetwork {
@@ -11,7 +12,7 @@ public class DogNetwork {
 
     static Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+            .addCallAdapterFactory(RxJavaCallAdapterFactory.createWithScheduler(Schedulers.io()))
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 
