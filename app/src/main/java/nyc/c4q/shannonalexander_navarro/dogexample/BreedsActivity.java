@@ -120,7 +120,7 @@ public class BreedsActivity extends AppCompatActivity {
                 String dogURL = randomDog.getMessage();
                 if (response.isSuccessful()){
 
-                    Picasso.with(BreedsActivity.this).load(dogURL).into(v);
+                    Picasso.get().load(dogURL).into(v);
                     Log.d("breed?", dogURL+"");
                 } else {
                     Log.d("failure", response.errorBody().toString()+"");
